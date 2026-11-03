@@ -79,6 +79,13 @@ import time
 import urllib.error
 import urllib.request
 
+try:
+    import yfinance as yf
+    import pandas as pd
+    HAVE_YFINANCE = True
+except ImportError:
+    HAVE_YFINANCE = False
+
 UA = "Mozilla/5.0 (compatible; day-trader-skill/2.0; +https://github.com/Jakeschincariol/day-trader-skill)"
 YAHOO_HOSTS = ("https://query2.finance.yahoo.com", "https://query1.finance.yahoo.com")
 NASDAQ_FILES = ("nasdaqlisted.txt", "otherlisted.txt")
@@ -93,6 +100,19 @@ MIN_DAILY_BARS = 30
 DEFAULT_UNIVERSE = "trader/universe.txt"
 NOTE = "A scan is a list of charts that match a rule, not a list of stocks to buy."
 
+NSE_HOLIDAYS = {
+    "2026-01-26": "Republic Day",
+    "2026-03-03": "Holi",
+    "2026-04-03": "Good Friday",
+    "2026-04-14": "Dr. Ambedkar Jayanti",
+    "2026-05-01": "Maharashtra Day",
+    "2026-08-15": "Independence Day",
+    "2026-10-02": "Mahatma Gandhi Jayanti",
+    "2026-10-20": "Dussehra",
+    "2026-11-08": "Diwali Laxmi Pujan",
+    "2026-11-24": "Guru Nanak Jayanti",
+    "2026-12-25": "Christmas Day",
+}
 NYSE_HOLIDAYS = {
     "2026-01-01": "New Year's Day",
     "2026-01-19": "Martin Luther King, Jr. Day",
@@ -121,8 +141,10 @@ NYSE_EARLY_CLOSE = {  # 1:00 p.m. ET
     "2027-11-26": "day after Thanksgiving",
 }
 CALENDAR_YEARS = (2026, 2027)
-OPEN = datetime.time(9, 30)
-CLOSE = datetime.time(16, 0)
+NSE_OPEN = datetime.time(9, 15)
+NSE_CLOSE = datetime.time(15, 30)
+OPEN = NSE_OPEN
+CLOSE = NSE_CLOSE
 EARLY = datetime.time(13, 0)
 
 SETUPS = [
@@ -137,6 +159,7 @@ LABEL = dict(SETUPS)
 
 class ScanError(Exception):
     pass
+
 
 
 # ---------------------------------------------------------------- time
@@ -158,60 +181,70 @@ def eastern_offset(utc):
     return -4 if start <= naive < end else -5
 
 
+def to_ist(utc):
+    return utc.replace(tzinfo=None) + datetime.timedelta(hours=5, minutes=30)
+
+
+def ist_to_utc(local):
+    return local.replace(tzinfo=None) - datetime.timedelta(hours=5, minutes=30)
+
+
 def to_eastern(utc):
-    return utc.replace(tzinfo=None) + datetime.timedelta(hours=eastern_offset(utc))
+    return to_ist(utc)
 
 
 def eastern_to_utc(local):
-    for off in (-4, -5):
-        utc = local - datetime.timedelta(hours=off)
-        if eastern_offset(utc) == off:
-            return utc
-    return local + datetime.timedelta(hours=5)
+    return ist_to_utc(local)
 
 
 def ts_to_eastern(ts):
-    """Unix seconds -> naive New York time. Never uses the machine's time zone."""
-    return to_eastern(datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(ts)))
+    """Unix seconds -> naive IST time."""
+    return datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(ts)) + datetime.timedelta(hours=5, minutes=30)
+
+
+def ts_to_local(ts, is_india=True):
+    if is_india:
+        return datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(ts)) + datetime.timedelta(hours=5, minutes=30)
+    return utc.replace(tzinfo=None) + datetime.timedelta(hours=eastern_offset(datetime.datetime(1970, 1, 1) + datetime.timedelta(seconds=int(ts))))
 
 
 def parse_now(text):
-    """ISO time -> naive UTC. A time without an offset is taken as New York time."""
+    """ISO time -> naive UTC. A time without an offset is taken as IST / local time."""
     if not text:
         return datetime.datetime.now(datetime.timezone.utc).replace(microsecond=0, tzinfo=None)
     t = text.strip().replace("Z", "+00:00")
     try:
         dt = datetime.datetime.fromisoformat(t)
     except ValueError:
-        raise ScanError('--now wants a time like "2026-10-19 10:15" (New York) or ...Z (UTC)')
+        raise ScanError('--now wants a time like "2026-10-19 10:15" (IST) or ...Z (UTC)')
     if dt.tzinfo is None:
-        return eastern_to_utc(dt)
+        return ist_to_utc(dt)
     return (dt - dt.utcoffset()).replace(tzinfo=None)
 
 
 def parse_hhmm(text, flag="--at"):
     m = re.match(r"^\s*(\d{1,2}):(\d{2})\s*$", text or "")
     if not m or int(m.group(1)) > 23 or int(m.group(2)) > 59:
-        raise ScanError("%s wants a New York time like 10:15" % flag)
+        raise ScanError("%s wants a time like 10:15" % flag)
     return datetime.time(int(m.group(1)), int(m.group(2)))
 
 
 def trading_day(d):
-    """(is_trading_day, reason). Weekends and the NYSE holiday list."""
+    """(is_trading_day, reason). Weekends and the NSE holiday list."""
     if d.weekday() >= 5:
         return False, "weekend"
-    name = NYSE_HOLIDAYS.get(d.isoformat())
+    name = NSE_HOLIDAYS.get(d.isoformat()) or NYSE_HOLIDAYS.get(d.isoformat())
     if name:
-        return False, "NYSE holiday: " + name
+        return False, "Market holiday: " + name
     return True, ""
 
 
 def session(d):
-    """(open_time, close_time) in New York time, or None if closed all day."""
+    """(open_time, close_time) in Indian IST, or None if closed all day."""
     ok, _ = trading_day(d)
     if not ok:
         return None
-    return OPEN, (EARLY if d.isoformat() in NYSE_EARLY_CLOSE else CLOSE)
+    return NSE_OPEN, NSE_CLOSE
 
 
 def clock_label(t):
@@ -268,7 +301,12 @@ def yahoo_get(path):
 
 
 def to_yahoo(sym):
-    return sym.upper().replace(".", "-")
+    s = sym.upper().strip()
+    if s.endswith(".NS") or s.endswith(".BO") or s.startswith("^"):
+        return s
+    if "." in s:
+        return s.replace(".", "-")
+    return s + ".NS"
 
 
 def spark_path(symbols, rng, interval):
@@ -582,12 +620,13 @@ def slot(day, k):
 
 
 def session_bars(series, day, cutoff):
-    """5-minute bars of `day` that are complete at `cutoff` (naive New York time),
+    """5-minute bars of `day` that are complete at `cutoff` (naive IST time),
     on the grid, with a close. Sorted, one per slot."""
     s = session(day)
-    close_t = s[1] if s else CLOSE
+    close_t = s[1] if s else NSE_CLOSE
+    open_t = s[0] if s else NSE_OPEN
     out = {}
-    hs, ls = series.get("h"), series.get("l")
+    hs, ls, os_col = series.get("h"), series.get("l"), series.get("o")
     for i, ts in enumerate(series["t"]):
         c = series["c"][i]
         if c is None:
@@ -595,12 +634,13 @@ def session_bars(series, day, cutoff):
         et = ts_to_eastern(ts)
         if et.date() != day or et.second or et.minute % BAR_MIN:
             continue  # another day, or the live tick off the grid
-        if et.time() < OPEN or et.time() >= close_t:
-            continue  # pre-market, after hours, the 4:00 PM closing print
+        if et.time() < open_t or et.time() >= close_t:
+            continue  # pre-market, after hours, closing print
         if et + datetime.timedelta(minutes=BAR_MIN) > cutoff:
             continue  # still in progress at the cutoff
         v = series.get("v")
         out[et] = {"start": et, "c": float(c),
+                   "o": None if not os_col or os_col[i] is None else float(os_col[i]),
                    "h": None if not hs or hs[i] is None else float(hs[i]),
                    "l": None if not ls or ls[i] is None else float(ls[i]),
                    "v": (v[i] or 0) if v else 0}
@@ -608,15 +648,17 @@ def session_bars(series, day, cutoff):
 
 
 def usable(bars, day, cutoff, n_range):
-    """Every slot from 9:30 to the cutoff is there, and at least the range."""
-    want = int((cutoff - slot(day, 0)).total_seconds() // (BAR_MIN * 60))
+    """Every slot from open (09:15) to the cutoff is there, and at least the range."""
     s = session(day)
+    open_t = s[0] if s else NSE_OPEN
+    slot0 = datetime.datetime.combine(day, open_t)
+    want = int((cutoff - slot0).total_seconds() // (BAR_MIN * 60))
     if s:
-        want = min(want, int((datetime.datetime.combine(day, s[1]) - slot(day, 0)).total_seconds()
+        want = min(want, int((datetime.datetime.combine(day, s[1]) - slot0).total_seconds()
                              // (BAR_MIN * 60)))
     if want < n_range or len(bars) != want:
         return False
-    return all(b["start"] == slot(day, k) for k, b in enumerate(bars))
+    return all(b["start"] == slot0 + datetime.timedelta(minutes=BAR_MIN * k) for k, b in enumerate(bars))
 
 
 def orb_candidate(bars, n_range):
@@ -627,21 +669,60 @@ def orb_candidate(bars, n_range):
 
 
 def orb_hit(bars, n_range):
-    """Stage 2, real highs and lows: the first completed bar to CLOSE above the range high."""
+    """Stage 2, real highs and lows: the first completed bar whose CANDLE BODY
+    closes completely outside the opening range high/low boundaries to ignore false wicks,
+    filtered by intraday VWAP alignment and volume surge confirmation."""
     rng = bars[:n_range]
     if any(b["h"] is None or b["l"] is None for b in rng):
         return None
     oh = max(b["h"] for b in rng)
     ol = min(b["l"] for b in rng)
-    for k in range(n_range, len(bars)):
+    mid = (oh + ol) / 2.0
+    if (oh - ol) / mid < 0.005:  # Filter out low-volatility chop
+        return None
+
+    # Calculate average ORB volume
+    or_vols = [b.get("v") or 0 for b in rng]
+    avg_or_vol = sum(or_vols) / len(or_vols) if or_vols else 0
+
+    # Running VWAP state
+    cum_tp_vol = 0.0
+    cum_vol = 0.0
+
+    for k in range(len(bars)):
         b = bars[k]
-        if b["c"] > oh:
+        bh = b["h"] if b["h"] is not None else b["c"]
+        bl = b["l"] if b["l"] is not None else b["c"]
+        bc = b["c"]
+        bo = b.get("o") if b.get("o") is not None else bc
+        bv = b.get("v") or 0
+        tp = (bh + bl + bc) / 3.0
+        cum_tp_vol += tp * (bv if bv > 0 else 1)
+        cum_vol += (bv if bv > 0 else 1)
+        vwap = (cum_tp_vol / cum_vol) if cum_vol > 0 else bc
+
+        if k < n_range:
+            continue
+
+        # Bullish breakout: candle body strictly > oh, price > VWAP, volume confirmed
+        if bc > oh and min(bo, bc) > oh and bc > vwap and (avg_or_vol == 0 or bv >= 0.9 * avg_or_vol):
             closes_at = b["start"] + datetime.timedelta(minutes=BAR_MIN)
-            return {"price": round(b["c"], 2), "at": clock_label(closes_at),
+            return {"price": round(bc, 2), "at": clock_label(closes_at),
                     "bar_start": b["start"].strftime("%H:%M"), "bar_index": k,
-                    "or_high": round(oh, 2), "or_low": round(ol, 2),
-                    "pct_over": round((b["c"] / oh - 1) * 100, 2), "_t": closes_at}
+                    "or_high": round(oh, 2), "or_low": round(ol, 2), "or_mid": round(mid, 2),
+                    "vwap": round(vwap, 2), "setup": "orb", "side": "buy",
+                    "pct_over": round((bc / oh - 1) * 100, 2), "_t": closes_at}
+
+        # Bearish breakdown: candle body strictly < ol, price < VWAP, volume confirmed
+        elif bc < ol and max(bo, bc) < ol and bc < vwap and (avg_or_vol == 0 or bv >= 0.9 * avg_or_vol):
+            closes_at = b["start"] + datetime.timedelta(minutes=BAR_MIN)
+            return {"price": round(bc, 2), "at": clock_label(closes_at),
+                    "bar_start": b["start"].strftime("%H:%M"), "bar_index": k,
+                    "or_high": round(oh, 2), "or_low": round(ol, 2), "or_mid": round(mid, 2),
+                    "vwap": round(vwap, 2), "setup": "orb", "side": "sell",
+                    "pct_over": round((1 - bc / ol) * 100, 2), "_t": closes_at}
     return None
+
 
 
 def orb_window(now_utc, at, or_minutes, until, explicit_day=None):
@@ -744,8 +825,59 @@ def progress(a, msg):
         print(msg, file=sys.stderr)
 
 
+def fetch_via_yfinance(symbols, rng="1d", interval="5m"):
+    """Fetch series using yfinance for Indian / global market symbols."""
+    if not HAVE_YFINANCE:
+        return {}, {s: "yfinance not installed" for s in symbols}
+    data, failed = {}, {}
+    period_map = {"1d": "5d", "5d": "5d", "3mo": "3mo", "1mo": "1mo"}
+    period = period_map.get(rng, "5d")
+    for s in symbols:
+        ysym = to_yahoo(s)
+        try:
+            df = yf.download(ysym, period=period, interval=interval, progress=False)
+            if df is None or df.empty:
+                failed[s] = "no data from Yahoo Finance"
+                continue
+            if isinstance(df.columns, pd.MultiIndex):
+                df = df.xs(ysym, axis=1, level=1)
+            df = df.dropna(subset=["Close"])
+            if df.empty:
+                failed[s] = "empty bars"
+                continue
+            ts = [int(t.timestamp()) for t in df.index]
+            opens = [float(x) for x in df["Open"].tolist()] if "Open" in df else [float(x) for x in df["Close"].tolist()]
+            highs = [float(x) for x in df["High"].tolist()] if "High" in df else [float(x) for x in df["Close"].tolist()]
+            lows = [float(x) for x in df["Low"].tolist()] if "Low" in df else [float(x) for x in df["Close"].tolist()]
+            closes = [float(x) for x in df["Close"].tolist()]
+            volumes = [float(x) for x in df["Volume"].tolist()] if "Volume" in df else [0.0] * len(closes)
+            last_p = float(closes[-1]) if closes else None
+            last_v = float(volumes[-1]) if volumes else None
+            data[s] = {
+                "t": ts,
+                "o": opens,
+                "h": highs,
+                "l": lows,
+                "c": closes,
+                "v": volumes,
+                "meta": {
+                    "symbol": ysym,
+                    "regularMarketPrice": last_p,
+                    "regularMarketVolume": last_v,
+                    "exchangeTimezoneName": "Asia/Kolkata" if ".NS" in ysym or ".BO" in ysym or "^NSE" in ysym else "America/New_York"
+                }
+            }
+        except Exception as e:
+            failed[s] = str(e)
+    return data, failed
+
+
 def fetch_spark(symbols, rng, interval, pause, a=None):
-    """Batches of 20. -> ({SYM: series}, {SYM: error})."""
+    """Batches of 20 with yfinance integration. -> ({SYM: series}, {SYM: error})."""
+    if HAVE_YFINANCE:
+        y_data, y_failed = fetch_via_yfinance(symbols, rng, interval)
+        if y_data:
+            return y_data, y_failed
     data, failed = {}, {}
     batches = [symbols[i:i + SPARK_MAX] for i in range(0, len(symbols), SPARK_MAX)]
     for k, batch in enumerate(batches):
@@ -766,6 +898,7 @@ def fetch_spark(symbols, rng, interval, pause, a=None):
         if a is not None and len(batches) > 25 and (k + 1) % 50 == 0:
             progress(a, "  spark %d of %d requests" % (k + 1, len(batches)))
     return data, failed
+
 
 
 def read_symbols(a, offline_syms=None):
@@ -976,6 +1109,10 @@ def cmd_orb(a):
             done.append(sym)
             if len(done) % 50 == 0:
                 progress(a, "  stage 2: %d v8 charts so far" % len(done))
+            if HAVE_YFINANCE:
+                yd, _ = fetch_via_yfinance([sym], rng=rng, interval="%dm" % BAR_MIN)
+                if sym in yd:
+                    return yd[sym]
             return parse_chart(yahoo_get(chart_path(sym, rng, "%dm" % BAR_MIN)), sym)
     hits, counts, failed2 = scan_orb(data, symbols, day, cutoff, a.or_minutes, a.min_price, a.min_volume, confirm,
                                      a.max_confirm)
@@ -995,7 +1132,7 @@ def cmd_orb(a):
     if a.json:
         print(json.dumps(dict(doc, counts=counts, seconds=round(time.time() - t0, 1)), indent=2))
         return 0 if hits else 1
-    print("Opening-range breakout scan, %s %s ET: %d-minute range (9:30 to %s), 5-minute bars, Yahoo."
+    print("Opening-range breakout scan, %s %s IST: %d-minute range (09:15 to %s), 5-minute bars, Yahoo."
           % (day_label(day), clock_label(cutoff), a.or_minutes, clock_label(slot(day, a.or_minutes // BAR_MIN))))
     print("Fetched %s of %s charts%s; %s usable%s; %s candidates, %s confirmed with real highs and lows."
           % ("{:,}".format(counts["fetched"]), "{:,}".format(len(symbols)),
@@ -1007,16 +1144,18 @@ def cmd_orb(a):
         print("PARTIAL: %s more candidates were not checked (only the %s most traded are; --max-confirm 0 "
               "checks all)." % ("{:,}".format(counts["unconfirmed"]), "{:,}".format(a.max_confirm)))
     if hits:
-        print("%d of %s charts closed above their opening-range high by %s:"
+        print("%d of %s charts closed with candle body outside their opening range by %s:"
               % (len(hits), ("the %s checked" % "{:,}".format(counts["confirmed"])) if counts["unconfirmed"]
                  else "{:,}".format(counts["scanned"]), clock_label(cutoff)))
         for h in hits[:a.show]:
-            print("  %8s  %-6s %10s  range %s to %s  %+.2f%% over" % (
-                h["at"], h["symbol"], money(h["price"]), _p(h["or_low"]), _p(h["or_high"]), h["pct_over"]))
+            mid_val = h.get("or_mid", (h["or_high"] + h["or_low"]) / 2.0)
+            side_tag = h.get("side", "buy").upper()
+            print("  %8s  %-12s %10s  [%4s] range %s to %s (mid %s) %+.2f%% over" % (
+                h["at"], h["symbol"], money(h["price"]), side_tag, _p(h["or_low"]), _p(h["or_high"]), _p(mid_val), h["pct_over"]))
         if len(hits) > a.show:
             print("  ... and %d more in the watchlist (--show N for more)." % (len(hits) - a.show))
     else:
-        print("No chart closed above its opening-range high by %s." % clock_label(cutoff))
+        print("No chart closed with candle body outside its opening range by %s." % clock_label(cutoff))
     if not a.no_write:
         print("Wrote %s (mode orb, %d hit%s)." % (a.out, len(hits), "" if len(hits) == 1 else "s"))
     print(NOTE + " Next: pick one chart, then /trader-news TICKER and /trader-entry TICKER.")
@@ -1059,7 +1198,7 @@ def main(argv=None):
     common(p, 5.0, 1000000)
     p = sub.add_parser("orb", help="opening-range breakouts so far today")
     common(p, 5.0, 0)
-    p.add_argument("--or-minutes", type=int, default=15)
+    p.add_argument("--or-minutes", type=int, default=30)
     p.add_argument("--max-confirm", type=int, default=MAX_CONFIRM,
                    help="v8 charts to fetch in stage 2, most traded first (%d; 0 = all)" % MAX_CONFIRM)
     p.add_argument("--at", help="cut the clock at this New York time, HH:MM")

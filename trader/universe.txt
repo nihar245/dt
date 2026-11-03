@@ -1,0 +1,100 @@
+RELIANCE.NS|Reliance Industries Ltd.
+TCS.NS|Tata Consultancy Services Ltd.
+HDFCBANK.NS|HDFC Bank Ltd.
+INFY.NS|Infosys Ltd.
+ICICIBANK.NS|ICICI Bank Ltd.
+BHARTIARTL.NS|Bharti Airtel Ltd.
+ITC.NS|ITC Ltd.
+SBIN.NS|State Bank of India
+LICI.NS|Life Insurance Corp of India
+HINDUNILVR.NS|Hindustan Unilever Ltd.
+LT.NS|Larsen & Toubro Ltd.
+BAJFINANCE.NS|Bajaj Finance Ltd.
+HCLTECH.NS|HCL Technologies Ltd.
+MARUTI.NS|Maruti Suzuki India Ltd.
+SUNPHARMA.NS|Sun Pharmaceutical Industries Ltd.
+ADANIENT.NS|Adani Enterprises Ltd.
+KOTAKBANK.NS|Kotak Mahindra Bank Ltd.
+TITAN.NS|Titan Company Ltd.
+ONGC.NS|Oil & Natural Gas Corp Ltd.
+TMPV.NS|Tata Motors Passenger Vehicles Ltd.
+NTPC.NS|NTPC Ltd.
+AXISBANK.NS|Axis Bank Ltd.
+ADANIPORTS.NS|Adani Ports and Special Economic Zone Ltd.
+POWERGRID.NS|Power Grid Corp of India Ltd.
+COALINDIA.NS|Coal India Ltd.
+WIPRO.NS|Wipro Ltd.
+BAJAJFINSV.NS|Bajaj Finserv Ltd.
+ULTRACEMCO.NS|UltraTech Cement Ltd.
+ASIANPAINT.NS|Asian Paints Ltd.
+NESTLEIND.NS|Nestle India Ltd.
+M&M.NS|Mahindra & Mahindra Ltd.
+JSWSTEEL.NS|JSW Steel Ltd.
+GRASIM.NS|Grasim Industries Ltd.
+TATASTEEL.NS|Tata Steel Ltd.
+SBILIFE.NS|SBI Life Insurance Company Ltd.
+TECHM.NS|Tech Mahindra Ltd.
+HDFCLIFE.NS|HDFC Life Insurance Company Ltd.
+BPCL.NS|Bharat Petroleum Corp Ltd.
+HINDALCO.NS|Hindalco Industries Ltd.
+EICHERMOT.NS|Eicher Motors Ltd.
+BRITANNIA.NS|Britannia Industries Ltd.
+DIVISLAB.NS|Divi's Laboratories Ltd.
+CIPLA.NS|Cipla Ltd.
+DRREDDY.NS|Dr. Reddy's Laboratories Ltd.
+APOLLOHOSP.NS|Apollo Hospitals Enterprise Ltd.
+TATACONSUM.NS|Tata Consumer Products Ltd.
+HEROMOTOCO.NS|Hero MotoCorp Ltd.
+INDUSINDBK.NS|IndusInd Bank Ltd.
+SHRIRAMFIN.NS|Shriram Finance Ltd.
+BEL.NS|Bharat Electronics Ltd.
+TRENT.NS|Trent Ltd.
+HAL.NS|Hindustan Aeronautics Ltd.
+VEDL.NS|Vedanta Ltd.
+SIEMENS.NS|Siemens Ltd.
+ABB.NS|ABB India Ltd.
+DLF.NS|DLF Ltd.
+ETERNAL.NS|Eternal Ltd. (Zomato)
+JIOFIN.NS|Jio Financial Services Ltd.
+CHOLAFIN.NS|Cholamandalam Investment and Finance Company Ltd.
+TVSMOTOR.NS|TVS Motor Company Ltd.
+AMBUJACEM.NS|Ambuja Cements Ltd.
+BANKBARODA.NS|Bank of Baroda
+CANBK.NS|Canara Bank
+PNB.NS|Punjab National Bank
+GAIL.NS|GAIL (India) Ltd.
+PFC.NS|Power Finance Corporation Ltd.
+RECLTD.NS|REC Ltd.
+IOC.NS|Indian Oil Corporation Ltd.
+PIDILITIND.NS|Pidilite Industries Ltd.
+HAVELLS.NS|Havells India Ltd.
+DABUR.NS|Dabur India Ltd.
+GODREJCP.NS|Godrej Consumer Products Ltd.
+SHREECEM.NS|Shree Cement Ltd.
+BERGEPAINT.NS|Berger Paints India Ltd.
+ICICILIFE.NS|ICICI Life Insurance Ltd.
+ICICIGI.NS|ICICI Lombard General Insurance Company Ltd.
+SBICARD.NS|SBI Cards and Payment Services Ltd.
+BAJAJHLDNG.NS|Bajaj Holdings & Investment Ltd.
+MARICO.NS|Marico Ltd.
+MOTHERSON.NS|Samvardhana Motherson International Ltd.
+TORNTPHARM.NS|Torrent Pharmaceuticals Ltd.
+LTM.NS|LTIMindtree Ltd.
+PERSISTENT.NS|Persistent Systems Ltd.
+COFORGE.NS|Coforge Ltd.
+POLYCAB.NS|Polycab India Ltd.
+DIXON.NS|Dixon Technologies (India) Ltd.
+CUMMINSIND.NS|Cummins India Ltd.
+BHEL.NS|Bharat Heavy Electricals Ltd.
+INDIGO.NS|InterGlobe Aviation Ltd.
+BOSCHLTD.NS|Bosch Ltd.
+COLPAL.NS|Colgate-Palmolive (India) Ltd.
+TATACHEM.NS|Tata Chemicals Ltd.
+TATACOMM.NS|Tata Communications Ltd.
+JINDALSTEL.NS|Jindal Steel & Power Ltd.
+NMDC.NS|NMDC Ltd.
+AUROPHARMA.NS|Aurobindo Pharma Ltd.
+LUPIN.NS|Lupin Ltd.
+ASHOKLEY.NS|Ashok Leyland Ltd.
+MUTHOOTFIN.NS|Muthoot Finance Ltd.
+VOLTAS.NS|Voltas Ltd.

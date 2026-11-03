@@ -1,0 +1,59 @@
+name: NSE Intraday Cloud Scanner & Phone Alerts
+
+on:
+  schedule:
+    # IST is UTC + 5:30
+    # 09:45 IST (Entry scan open) -> 04:15 UTC
+    - cron: '15 4 * * 1-5'
+    # 10:15 IST (Scan 2) -> 04:45 UTC
+    - cron: '45 4 * * 1-5'
+    # 10:45 IST (Scan 3) -> 05:15 UTC
+    - cron: '15 5 * * 1-5'
+    # 11:15 IST (Scan 4) -> 05:45 UTC
+    - cron: '45 5 * * 1-5'
+    # 12:00 IST (Midday scan) -> 06:30 UTC
+    - cron: '30 6 * * 1-5'
+    # 14:30 IST (Stale Trade Profit Lock check) -> 09:00 UTC
+    - cron: '0 9 * * 1-5'
+  workflow_dispatch:
+    inputs:
+      custom_topic:
+        description: 'Optional custom ntfy topic override'
+        required: false
+        default: ''
+
+jobs:
+  scan-and-alert:
+    name: Run Intraday Scan & Push Alerts
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run Intraday Scanner & Phone Notifier
+        env:
+          NTFY_TOPIC: ${{ github.event.inputs.custom_topic || '' }}
+        run: |
+          python live_paper_trader.py --notify
+
+      - name: Commit & Sync Paper Trading Journal
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add trader/paper_journal.md trader/paper_trades.json trader/state/ || true
+          git diff-index --quiet HEAD || (git commit -m "chore: auto-sync paper trading journal [skip ci]" && git push)
+

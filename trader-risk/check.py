@@ -68,12 +68,12 @@ import re
 import sys
 
 DEFAULTS = {
-    "budget": None, "cash_buffer_pct": 10, "max_position_pct": 75, "max_order_usd": 4000,
-    "min_order_usd": 5, "max_loss_per_trade_usd": 50, "max_daily_loss_usd": 150, "max_trades_per_day": 3,
-    "max_orders_per_day": 10, "min_reward_risk": 1.0, "require_stop": True,
-    "no_entries_before": "09:45", "no_entries_after": "15:30", "flat_by": "15:55",
+    "budget": 50000, "currency": "INR", "cash_buffer_pct": 10, "max_position_pct": 75, "max_order_usd": 250000,
+    "min_order_usd": 100, "max_loss_per_trade_usd": 850, "max_daily_loss_usd": 1700, "max_trades_per_day": 2,
+    "max_orders_per_day": 4, "min_reward_risk": 1.4, "require_stop": True,
+    "no_entries_before": "09:45", "no_entries_after": "13:00", "flat_by": "15:15",
     "paper": True, "blocked": [], "allow_options": False, "allow_margin": False, "allow_short": False,
-    "pdt_guard": False,
+    "pdt_guard": False, "market": "NSE",
 }
 ALPACA_FIELDS = ("symbol", "side", "qty", "notional", "type", "time_in_force", "limit_price",
                  "stop_price", "trail_price", "trail_percent", "extended_hours", "client_order_id",
@@ -84,7 +84,7 @@ PRICE_FIELDS = ("qty", "notional", "limit_price", "stop_price", "take_profit_lim
 TYPES = {"market", "limit", "stop", "stop_limit", "trailing_stop"}
 TIFS = {"day", "gtc", "opg", "cls", "ioc", "fok"}
 OCC = re.compile(r"^[A-Z]{1,6}\d{6}[CP]\d{8}$")
-TICKER = re.compile(r"^[A-Z]{1,5}([.\-][A-Z]{1,2})?$")
+TICKER = re.compile(r"^[\^A-Z][A-Z0-9.\-]{0,14}$")
 HHMM = re.compile(r"^([01]?\d|2[0-3]):([0-5]\d)$")
 CENT = 0.005
 FRESH_MINUTES = 15
@@ -113,6 +113,20 @@ NYSE_HOLIDAYS = {
     "2027-11-25": "Thanksgiving Day",
     "2027-12-24": "Christmas Day (observed)",
 }
+NSE_HOLIDAYS = {
+    "2026-01-26": "Republic Day",
+    "2026-03-03": "Holi",
+    "2026-03-20": "Id-ul-Fitr",
+    "2026-04-03": "Good Friday",
+    "2026-04-14": "Dr. Ambedkar Jayanti",
+    "2026-05-01": "Maharashtra Day",
+    "2026-08-15": "Independence Day",
+    "2026-10-02": "Mahatma Gandhi Jayanti",
+    "2026-10-20": "Dussehra",
+    "2026-11-08": "Diwali Laxmi Pujan",
+    "2026-11-24": "Gurunanak Jayanti",
+    "2026-12-25": "Christmas",
+}
 NYSE_EARLY_CLOSE = {  # 1:00 p.m. ET
     "2026-11-27": "day after Thanksgiving",
     "2026-12-24": "Christmas Eve",
@@ -122,6 +136,11 @@ CALENDAR_YEARS = (2026, 2027)
 OPEN = datetime.time(9, 30)
 CLOSE = datetime.time(16, 0)
 EARLY = datetime.time(13, 0)
+NSE_OPEN = datetime.time(9, 15)
+NSE_CLOSE = datetime.time(15, 30)
+
+def to_ist(utc):
+    return utc.replace(tzinfo=None) + datetime.timedelta(hours=5, minutes=30)
 
 
 class RiskError(Exception):
@@ -185,10 +204,15 @@ def parse_utc(text):
     return dt
 
 
-def trading_day(d):
-    """(is_trading_day, reason). Weekends and the NYSE holiday list."""
+def trading_day(d, is_nse=False):
+    """(is_trading_day, reason). Weekends and the NYSE/NSE holiday list."""
     if d.weekday() >= 5:
         return False, "weekend"
+    if is_nse:
+        name = NSE_HOLIDAYS.get(d.isoformat())
+        if name:
+            return False, "NSE holiday: " + name
+        return True, ""
     name = NYSE_HOLIDAYS.get(d.isoformat())
     if name:
         return False, "NYSE holiday: " + name
@@ -201,7 +225,7 @@ def hhmm(value, key):
         return None
     m = HHMM.match(str(value).strip())
     if not m:
-        raise RiskError("%s must be a New York time like \"09:45\", got %r" % (key, value))
+        raise RiskError("%s must be a time like \"09:45\", got %r" % (key, value))
     return datetime.time(int(m.group(1)), int(m.group(2)))
 
 
@@ -210,35 +234,37 @@ def _shift(t, hours):
     return dt.time()
 
 
-def window_check(now_et, c):
-    """Reasons an entry cannot be placed now (New York time). Empty when the window is off."""
+def window_check(now_local, c, is_nse=False):
+    """Reasons an entry cannot be placed now. Empty when the window is off."""
     before = hhmm(c.get("no_entries_before"), "no_entries_before")
     after = hhmm(c.get("no_entries_after"), "no_entries_after")
     if before is None and after is None:
         return [], []
     warns = []
-    d, t = now_et.date(), now_et.time().replace(second=0, microsecond=0)
-    if d.year not in CALENDAR_YEARS:
+    d, t = now_local.date(), now_local.time().replace(second=0, microsecond=0)
+    tz_name = "IST" if is_nse else "New York"
+    if not is_nse and d.year not in CALENDAR_YEARS:
         warns.append("the holiday list covers %s only: check nyse.com for %s"
                      % (" and ".join(map(str, CALENDAR_YEARS)), d.isoformat()))
-    ok, why = trading_day(d)
-    stamp = now_et.strftime("%a %Y-%m-%d %H:%M")
+    ok, why = trading_day(d, is_nse=is_nse)
+    stamp = now_local.strftime("%a %Y-%m-%d %H:%M")
     if not ok:
-        return ["window: the market is closed today (%s, %s New York)" % (why, stamp)], warns
-    close = EARLY if d.isoformat() in NYSE_EARLY_CLOSE else CLOSE
-    if t < OPEN or now_et.time() >= close:
-        return ["window: the market is closed (%s New York; the session is %s to %s)"
-                % (stamp, OPEN.strftime("%H:%M"), close.strftime("%H:%M"))], warns
-    if close == EARLY and after is not None:
+        return ["window: the market is closed today (%s, %s %s)" % (why, stamp, tz_name)], warns
+    open_time = NSE_OPEN if is_nse else OPEN
+    close = NSE_CLOSE if is_nse else (EARLY if d.isoformat() in NYSE_EARLY_CLOSE else CLOSE)
+    if t < open_time or now_local.time() >= close:
+        return ["window: the market is closed (%s %s; the session is %s to %s)"
+                % (stamp, tz_name, open_time.strftime("%H:%M"), close.strftime("%H:%M"))], warns
+    if not is_nse and close == EARLY and after is not None:
         after = _shift(after, 3)
         warns.append("early close at 1:00 p.m. today (%s): no new entries after %s"
                      % (NYSE_EARLY_CLOSE[d.isoformat()], after.strftime("%H:%M")))
     if before is not None and t < before:
-        return ["window: no new entries before %s New York (it is %s)" % (before.strftime("%H:%M"),
-                                                                          t.strftime("%H:%M"))], warns
+        return ["window: no new entries before %s %s (it is %s)" % (before.strftime("%H:%M"),
+                                                                    tz_name, t.strftime("%H:%M"))], warns
     if after is not None and t > after:
-        return ["window: no new entries after %s New York (it is %s)" % (after.strftime("%H:%M"),
-                                                                         t.strftime("%H:%M"))], warns
+        return ["window: no new entries after %s %s (it is %s)" % (after.strftime("%H:%M"),
+                                                                   tz_name, t.strftime("%H:%M"))], warns
     return [], warns
 
 
@@ -283,7 +309,7 @@ def _f(x):
 
 
 def money(x):
-    return "$" + "{:,.2f}".format(float(x)).replace(".00", "")
+    return "₹" + "{:,.2f}".format(float(x)).replace(".00", "")
 
 
 def _cent(x):
@@ -377,15 +403,46 @@ def check(orders, cfg, portfolio=None, prices=None, state=None, today=None, now=
     price_times  {SYM: naive UTC time of that price}; None = every price counts as fresh"""
     c = dict(DEFAULTS)
     c.update(cfg or {})
+    is_nse = c.get("market", "").upper() in ("NSE", "BSE", "INDIA") or any(".NS" in str(o.get("symbol", "")).upper() for o in orders)
     prices = {str(k).upper(): float(v) for k, v in (prices or {}).items() if _f(v)}
     now_utc = now or parse_now(None)
-    now_et = to_eastern(now_utc)
-    today = today or now_et.date().isoformat()
+    now_local = to_ist(now_utc) if is_nse else to_eastern(now_utc)
+    today = today or now_local.date().isoformat()
     acct, top_warn = account(c, portfolio, prices)
     blocked = {str(b).upper() for b in c.get("blocked") or []}
     done_today = placed_today(state, today)
     count_today = len(done_today)
     entries_today = [r for r in done_today if rec_is_entry(r)]
+    current_daily_trades = len(entries_today)
+    cap_t = int(c.get("max_trades_per_day") or 2)
+
+    # STRICT SESSION GUARDRAIL: If current_daily_trades >= cap_t, output an absolute 'BLOCK' payload and halt execution
+    if current_daily_trades >= cap_t:
+        top_warn.append("SESSION GUARDRAIL TRIPPED: current_daily_trades (%d) >= %d session cap reached. Halting." % (current_daily_trades, cap_t))
+        for i, o in enumerate(orders, 1):
+            sym = str(o.get("symbol", "")).strip().upper()
+            side = str(o.get("side", "")).strip().lower()
+            results.append({
+                "index": i, "symbol": sym, "side": side, "kind": "entry",
+                "verdict": "BLOCK",
+                "reasons": ["SESSION GUARDRAIL BLOCK: current_daily_trades (%d) >= %d limit reached. Absolute halt." % (current_daily_trades, cap_t)],
+                "warnings": ["HALT: Maximum daily trades cap enforced."],
+                "fingerprint": fingerprint(o) if isinstance(o, dict) else ""
+            })
+        return {
+            "date": today,
+            "now_ist" if is_nse else "now_new_york": now_local.strftime("%Y-%m-%d %H:%M"),
+            "paper": bool(c.get("paper", True)),
+            "guardrail_status": "BLOCK",
+            "halt": True,
+            "results": results,
+            "pass": 0,
+            "block": len(results),
+            "warnings": top_warn,
+            "cash_after": round(acct["cash"], 2),
+            "today": {"orders_placed": count_today, "entries_placed": current_daily_trades, "session_cap": cap_t}
+        }
+
     loss_today = 0.0
     for r in entries_today:
         ml = _f(r.get("max_loss"))
@@ -395,7 +452,7 @@ def check(orders, cfg, portfolio=None, prices=None, state=None, today=None, now=
         else:
             loss_today += ml
     placed_keys = {(str(r.get("symbol", "")).upper(), r.get("side")) for r in done_today}
-    win_reasons, win_warns = window_check(now_et, c)
+    win_reasons, win_warns = window_check(now_local, c, is_nse=is_nse)
     pdt_n, pdt_list = day_trades(state, today) if c.get("pdt_guard") else (0, [])
     seen = set()
     results = []
@@ -619,10 +676,10 @@ def check(orders, cfg, portfolio=None, prices=None, state=None, today=None, now=
                     later.append("daily loss: %s already at risk today plus %s for this one = %s, over your %s "
                                  "daily loss limit" % (money(used), money(max_loss), money(used + max_loss),
                                                        money(daily)))
-            cap_t = int(c.get("max_trades_per_day") or 0)
-            if cap_t and len(entries_today) + batch_entries >= cap_t:
-                later.append("trades: %d entries placed today plus %d passed earlier in this batch, your limit "
-                             "is %d a day" % (len(entries_today), batch_entries, cap_t))
+            cap_t = int(c.get("max_trades_per_day") or 5)
+            if cap_t and current_daily_trades + batch_entries >= cap_t:
+                later.append("trades: SESSION GUARDRAIL BLOCK - %d entries placed today + %d passed in this batch >= %d cap"
+                             % (current_daily_trades, batch_entries, cap_t))
             later.extend(win_reasons)
             if c.get("pdt_guard") and pdt_n >= 3:
                 later.append("pdt: %d day trades in the last 5 business days (%s); a 4th trips the "
@@ -693,14 +750,15 @@ def check(orders, cfg, portfolio=None, prices=None, state=None, today=None, now=
 
     return {
         "date": today,
-        "now_new_york": now_et.strftime("%Y-%m-%d %H:%M"),
+        "now_local": now_local.strftime("%Y-%m-%d %H:%M"),
+        "now_ist" if is_nse else "now_new_york": now_local.strftime("%Y-%m-%d %H:%M"),
         "paper": bool(c.get("paper", True)),
         "results": results,
         "pass": sum(1 for r in results if r["verdict"] == "PASS"),
         "block": sum(1 for r in results if r["verdict"] == "BLOCK"),
         "warnings": top_warn,
         "cash_after": round(acct["cash"], 2),
-        "today": {"orders_placed": count_today, "entries_placed": len(entries_today),
+        "today": {"orders_placed": count_today, "entries_placed": current_daily_trades,
                   "loss_at_risk": round(loss_today, 2), "day_trades_5d": pdt_n if c.get("pdt_guard") else None},
     }
 

@@ -1,0 +1,15 @@
+# Secrets & Broker Credentials
+flattrade_creds.json
+trader/flattrade_creds.json
+.env
+*.token
+
+# Python cache & artifacts
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+
+# Data cache (optional)
+trader/data_cache_60d/*.csv
+

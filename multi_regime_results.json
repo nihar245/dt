@@ -1,0 +1,220 @@
+{
+  "best_policy": "Policy B (Target 1.5R, BE@0.7R)",
+  "records": [
+    {
+      "policy": "Policy A (Baseline: Target 1.4R, BE@0.8R)",
+      "trades": 14,
+      "win_rate": 35.714285714285715,
+      "gross": -523.0200000000002,
+      "fees": 840.0,
+      "net": -1363.0200000000002,
+      "target_days": 2
+    },
+    {
+      "policy": "Policy B (Target 1.5R, BE@0.7R)",
+      "trades": 14,
+      "win_rate": 35.714285714285715,
+      "gross": -25.539999999999964,
+      "fees": 840.0,
+      "net": -865.54,
+      "target_days": 2
+    },
+    {
+      "policy": "Policy C (Two-Tier: 1.5R, BE@0.7R, Lock@1.1R->0.5R)",
+      "trades": 14,
+      "win_rate": 35.714285714285715,
+      "gross": -25.539999999999964,
+      "fees": 840.0,
+      "net": -865.54,
+      "target_days": 2
+    },
+    {
+      "policy": "Policy D (Ambitious: 1.8R, BE@0.8R, Lock@1.3R->0.8R)",
+      "trades": 14,
+      "win_rate": 35.714285714285715,
+      "gross": -1040.7200000000003,
+      "fees": 840.0,
+      "net": -1880.7200000000005,
+      "target_days": 1
+    },
+    {
+      "policy": "Policy E (Static No-Trail: 1.5R, Hard Stop)",
+      "trades": 14,
+      "win_rate": 35.714285714285715,
+      "gross": -354.3400000000002,
+      "fees": 840.0,
+      "net": -1194.3400000000001,
+      "target_days": 2
+    }
+  ],
+  "best_trades": [
+    {
+      "date": "2026-10-19",
+      "sym": "INFY.NS",
+      "side": "SELL",
+      "entry": 1126.949951171875,
+      "exit_price": 1127.9000244140625,
+      "outcome": "EOD_FLAT",
+      "gross": -44.65,
+      "fee": 60.0,
+      "net": -104.65,
+      "target": 1099.99
+    },
+    {
+      "date": "2026-10-21",
+      "sym": "BHARTIARTL.NS",
+      "side": "SELL",
+      "entry": 1867.0999755859375,
+      "exit_price": 1877.5,
+      "outcome": "EOD_FLAT",
+      "gross": -280.8,
+      "fee": 60.0,
+      "net": -340.8,
+      "target": 1821.5
+    },
+    {
+      "date": "2026-10-22",
+      "sym": "KOTAKBANK.NS",
+      "side": "BUY",
+      "entry": 442.0,
+      "exit_price": 437.04998779296875,
+      "outcome": "EOD_FLAT",
+      "gross": -643.5,
+      "fee": 60.0,
+      "net": -703.5,
+      "target": 451.79
+    },
+    {
+      "date": "2026-10-23",
+      "sym": "RELIANCE.NS",
+      "side": "SELL",
+      "entry": 1173.9000244140625,
+      "exit_price": 1185.5,
+      "outcome": "EOD_FLAT",
+      "gross": -533.6,
+      "fee": 60.0,
+      "net": -593.6,
+      "target": 1146.3
+    },
+    {
+      "date": "2026-10-26",
+      "sym": "POWERGRID.NS",
+      "side": "BUY",
+      "entry": 249.0,
+      "exit_price": 245.6999969482422,
+      "outcome": "STOP_LOSS",
+      "gross": -848.1,
+      "fee": 60.0,
+      "net": -908.1,
+      "target": 253.95
+    },
+    {
+      "date": "2026-10-27",
+      "sym": "INFY.NS",
+      "side": "BUY",
+      "entry": 1155.4000244140625,
+      "exit_price": 1156.3375244140625,
+      "outcome": "BREAKEVEN",
+      "gross": 60.0,
+      "fee": 60.0,
+      "net": 0.0,
+      "target": 1175.16
+    },
+    {
+      "date": "2026-10-28",
+      "sym": "RELIANCE.NS",
+      "side": "SELL",
+      "entry": 1179.5,
+      "exit_price": 1158.8,
+      "outcome": "TARGET",
+      "gross": 1262.7,
+      "fee": 60.0,
+      "net": 1202.7,
+      "target": 1158.8
+    },
+    {
+      "date": "2026-10-29",
+      "sym": "KOTAKBANK.NS",
+      "side": "BUY",
+      "entry": 448.6000061035156,
+      "exit_price": 456.14,
+      "outcome": "TARGET",
+      "gross": 1274.26,
+      "fee": 60.0,
+      "net": 1214.26,
+      "target": 456.14
+    },
+    {
+      "date": "2026-10-30",
+      "sym": "HCLTECH.NS",
+      "side": "BUY",
+      "entry": 1444.0,
+      "exit_price": 1435.0999755859375,
+      "outcome": "EOD_FLAT",
+      "gross": -364.9,
+      "fee": 60.0,
+      "net": -424.9,
+      "target": 1474.53
+    },
+    {
+      "date": "2026-10-12",
+      "sym": "RELIANCE.NS",
+      "side": "SELL",
+      "entry": 1166.800048828125,
+      "exit_price": 1156.0,
+      "outcome": "EOD_FLAT",
+      "gross": 756.0,
+      "fee": 60.0,
+      "net": 696.0,
+      "target": 1148.8
+    },
+    {
+      "date": "2026-10-13",
+      "sym": "HCLTECH.NS",
+      "side": "BUY",
+      "entry": 1308.300048828125,
+      "exit_price": 1320.0999755859375,
+      "outcome": "EOD_FLAT",
+      "gross": 212.4,
+      "fee": 60.0,
+      "net": 152.4,
+      "target": 1375.73
+    },
+    {
+      "date": "2026-10-14",
+      "sym": "KOTAKBANK.NS",
+      "side": "SELL",
+      "entry": 439.0,
+      "exit_price": 438.45001220703125,
+      "outcome": "EOD_FLAT",
+      "gross": 149.6,
+      "fee": 60.0,
+      "net": 89.6,
+      "target": 434.31
+    },
+    {
+      "date": "2026-10-15",
+      "sym": "BHARTIARTL.NS",
+      "side": "BUY",
+      "entry": 1860.800048828125,
+      "exit_price": 1851.5,
+      "outcome": "EOD_FLAT",
+      "gross": -176.7,
+      "fee": 60.0,
+      "net": -236.7,
+      "target": 1925.6
+    },
+    {
+      "date": "2026-10-16",
+      "sym": "KOTAKBANK.NS",
+      "side": "BUY",
+      "entry": 451.29998779296875,
+      "exit_price": 446.4250030517578,
+      "outcome": "STOP_LOSS",
+      "gross": -848.25,
+      "fee": 60.0,
+      "net": -908.25,
+      "target": 458.61
+    }
+  ]
+}

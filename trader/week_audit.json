@@ -1,0 +1,103 @@
+{
+  "evaluation_period": {
+    "start": "2026-10-26",
+    "end": "2026-10-30",
+    "sessions": 5
+  },
+  "universe": "Groww MIS Approved Nifty 50 Category 1",
+  "model_a_baseline": {
+    "risk_per_trade_inr": 200.0,
+    "total_net_pnl_inr": -2702.65,
+    "average_daily_net_pnl_inr": -540.53,
+    "daily_summaries": [
+      {
+        "date": "2026-10-26",
+        "trades": 5,
+        "wins": 0,
+        "gross": -406.0,
+        "friction": 300.0,
+        "net": -706.0
+      },
+      {
+        "date": "2026-10-27",
+        "trades": 5,
+        "wins": 3,
+        "gross": 94.14,
+        "friction": 300.0,
+        "net": -205.86
+      },
+      {
+        "date": "2026-10-28",
+        "trades": 5,
+        "wins": 1,
+        "gross": -590.4,
+        "friction": 300.0,
+        "net": -890.4
+      },
+      {
+        "date": "2026-10-29",
+        "trades": 5,
+        "wins": 2,
+        "gross": 141.26,
+        "friction": 300.0,
+        "net": -158.74
+      },
+      {
+        "date": "2026-10-30",
+        "trades": 5,
+        "wins": 1,
+        "gross": -441.65,
+        "friction": 300.0,
+        "net": -741.65
+      }
+    ]
+  },
+  "model_b_scaled_target": {
+    "risk_per_trade_inr": 750.0,
+    "total_net_pnl_inr": -6074.93,
+    "average_daily_net_pnl_inr": -1214.99,
+    "days_above_2000": 0,
+    "daily_summaries": [
+      {
+        "date": "2026-10-26",
+        "trades": 5,
+        "wins": 1,
+        "gross": -1578.75,
+        "friction": 300.0,
+        "net": -1878.75
+      },
+      {
+        "date": "2026-10-27",
+        "trades": 5,
+        "wins": 3,
+        "gross": 392.03,
+        "friction": 300.0,
+        "net": 92.03
+      },
+      {
+        "date": "2026-10-28",
+        "trades": 5,
+        "wins": 1,
+        "gross": -2214.6,
+        "friction": 300.0,
+        "net": -2514.6
+      },
+      {
+        "date": "2026-10-29",
+        "trades": 5,
+        "wins": 2,
+        "gross": 469.24,
+        "friction": 300.0,
+        "net": 169.24
+      },
+      {
+        "date": "2026-10-30",
+        "trades": 5,
+        "wins": 1,
+        "gross": -1642.85,
+        "friction": 300.0,
+        "net": -1942.85
+      }
+    ]
+  }
+}

@@ -54,42 +54,28 @@ UA = "Mozilla/5.0 (compatible; day-trader-skill/2.0; +https://github.com/Jakesch
 BACKOFF = 5.0
 HOSTS = ("query2", "query1")
 INTERVALS = {"1m": 60, "5m": 300}
-DEFAULTS = {"flat_by": "15:55", "min_reward_risk": 1.0}
+DEFAULTS = {"flat_by": "15:15", "min_reward_risk": 1.5, "max_reward_risk": 2.0}
 ATR_BARS = 14
 MIN_RISK_PCT = Decimal("0.05")     # risk under 0.05% of the price is inside the spread's noise
 CENT = Decimal("0.01")
 EPOCH = datetime.datetime(1970, 1, 1)
 NOTE = "A stop is a plan, not a guarantee: a gap or a fast market can fill past it."
 
-NYSE_HOLIDAYS = {
-    "2026-01-01": "New Year's Day",
-    "2026-01-19": "Martin Luther King, Jr. Day",
-    "2026-02-16": "Washington's Birthday",
+NSE_HOLIDAYS = {
+    "2026-01-26": "Republic Day",
+    "2026-03-03": "Holi",
     "2026-04-03": "Good Friday",
-    "2026-05-25": "Memorial Day",
-    "2026-06-19": "Juneteenth National Independence Day",
-    "2026-07-03": "Independence Day (observed)",
-    "2026-09-07": "Labor Day",
-    "2026-11-26": "Thanksgiving Day",
+    "2026-04-14": "Dr. Ambedkar Jayanti",
+    "2026-05-01": "Maharashtra Day",
+    "2026-08-15": "Independence Day",
+    "2026-10-02": "Mahatma Gandhi Jayanti",
+    "2026-10-20": "Dussehra",
+    "2026-11-08": "Diwali Laxmi Pujan",
+    "2026-11-24": "Guru Nanak Jayanti",
     "2026-12-25": "Christmas Day",
-    "2027-01-01": "New Year's Day",
-    "2027-01-18": "Martin Luther King, Jr. Day",
-    "2027-02-15": "Washington's Birthday",
-    "2027-03-26": "Good Friday",
-    "2027-05-31": "Memorial Day",
-    "2027-06-18": "Juneteenth National Independence Day (observed)",
-    "2027-07-05": "Independence Day (observed)",
-    "2027-09-06": "Labor Day",
-    "2027-11-25": "Thanksgiving Day",
-    "2027-12-24": "Christmas Day (observed)",
 }
-NYSE_EARLY_CLOSE = {  # 1:00 p.m. ET
-    "2026-11-27": "day after Thanksgiving",
-    "2026-12-24": "Christmas Eve",
-    "2027-11-26": "day after Thanksgiving",
-}
-OPEN = datetime.time(9, 30)
-CLOSE = datetime.time(16, 0)
+OPEN = datetime.time(9, 15)
+CLOSE = datetime.time(15, 30)
 EARLY = datetime.time(13, 0)
 
 
@@ -99,31 +85,21 @@ class PlanError(Exception):
 
 # ---------------------------------------------------------------- time
 
-def _nth_sunday(year, month, n):
-    d = datetime.date(year, month, 1)
-    d += datetime.timedelta(days=(6 - d.weekday()) % 7)
-    return d + datetime.timedelta(weeks=n - 1)
+def to_ist(utc):
+    return utc.replace(tzinfo=None) + datetime.timedelta(hours=5, minutes=30)
 
 
-def eastern_offset(utc):
-    """Hours from UTC for New York: -4 in daylight time, -5 otherwise (US rule since 2007)."""
-    y = utc.year
-    start = datetime.datetime.combine(_nth_sunday(y, 3, 2), datetime.time(7, 0))   # 2:00 EST
-    end = datetime.datetime.combine(_nth_sunday(y, 11, 1), datetime.time(6, 0))    # 2:00 EDT
-    naive = utc.replace(tzinfo=None)
-    return -4 if start <= naive < end else -5
+def ist_to_utc(local):
+    return local.replace(tzinfo=None) - datetime.timedelta(hours=5, minutes=30)
 
 
 def to_eastern(utc):
-    return utc.replace(tzinfo=None) + datetime.timedelta(hours=eastern_offset(utc))
+    return to_ist(utc)
 
 
 def eastern_to_utc(local):
-    for off in (-4, -5):
-        utc = local - datetime.timedelta(hours=off)
-        if eastern_offset(utc) == off:
-            return utc
-    return local + datetime.timedelta(hours=5)
+    return ist_to_utc(local)
+
 
 
 def utc_now():
@@ -253,13 +229,13 @@ def parse_target(text):
     m = re.match(r"^([0-9]*\.?[0-9]+)\s*[Rr]$", t)
     if m:
         r = D(m.group(1), "--target")
-        if r <= 0:
-            raise PlanError("--target needs an R multiple above 0, like 1R or 2R")
+        if r < Decimal("1.5") or r > Decimal("2.0"):
+            raise PlanError("--target must be between 1.5R and 2R (strict 1.5R-2R profile, got %r)" % text)
         return "r", r
     m = re.match(r"^price:\s*\$?([0-9][0-9,]*\.?[0-9]*)$", t.lower())
     if m:
         return "price", D(m.group(1), "--target")
-    raise PlanError("--target is 2R, 1R, 1.5R ... or price:X (got %r)" % text)
+    raise PlanError("--target is 2R, 1.5R ... or price:X (got %r)" % text)
 
 
 def r_label(r):
@@ -269,7 +245,7 @@ def r_label(r):
 
 def compute(entry, stop_rule, stop_param, target_rule, target_param, or_high=None, or_low=None,
             atr=None, atr_bars=None):
-    """The stop, the target and the risk, in exact cents. Raises PlanError with the reason."""
+    """The stop, the target and the risk, in exact cents. Hardcoded or-mid stop and strict 1.5R to 2R target."""
     e = cents(entry)
     if e <= 0:
         raise PlanError("the entry price must be above $0")
@@ -326,11 +302,14 @@ def compute(entry, stop_rule, stop_param, target_rule, target_param, or_high=Non
         raise PlanError("the target %s is at or below the entry %s: a long's target goes above it"
                         % (money(target), money(e)))
     rr = ((target - e) / risk).quantize(CENT, rounding=ROUND_HALF_UP)
+    if rr < Decimal("1.5") or rr > Decimal("2.0"):
+        raise PlanError("Reward-to-Risk ratio %.2f violates strict 1.5R to 2R target requirement" % float(rr))
     if t_label is None:
         t_label = "your price (%sR)" % ratio(rr)
     return {"entry": e, "stop": stop, "stop_label": label, "stop_detail": detail, "target": target,
             "target_r": target_param if target_rule == "r" else rr, "target_label": t_label,
             "risk": risk, "reward_risk": rr}
+
 
 
 # ---------------------------------------------------------------- bars for ATR (same reader as trader-entry)

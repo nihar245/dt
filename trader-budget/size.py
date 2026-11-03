@@ -60,22 +60,24 @@ import sys
 
 # v2 defaults: the contract's config.example.json. Missing keys fall back to these.
 DEFAULTS = {
-    "budget": None,
+    "budget": 50000,
     "cash_buffer_pct": 10,
     "max_position_pct": 75,
-    "max_order_usd": 4000,
+    "max_order_usd": 25000,
     "min_order_usd": 5,
-    "max_loss_per_trade_usd": 50,
-    "max_daily_loss_usd": 150,
-    "max_trades_per_day": 3,
-    "max_orders_per_day": 10,
-    "min_reward_risk": 1.0,
+    "max_loss_per_trade_usd": 850,
+    "max_loss_per_trade_inr": 850,
+    "max_daily_loss_usd": 1700,
+    "max_daily_loss_inr": 1700,
+    "max_trades_per_day": 2,
+    "max_orders_per_day": 4,
+    "min_reward_risk": 1.4,
     "require_stop": True,
     "no_entries_before": "09:45",
-    "no_entries_after": "15:30",
-    "flat_by": "15:55",
+    "no_entries_after": "13:00",
+    "flat_by": "15:15",
     "fractional": False,
-    "broker": "alpaca",
+    "broker": "paper",
     "paper": True,
     "blocked": [],
     "allow_options": False,
@@ -83,6 +85,7 @@ DEFAULTS = {
     "allow_short": False,
     "pdt_guard": False,
 }
+
 EPS = 1e-9
 FRESH_MINUTES = 15
 SETUP_WORDS = {"orb": "opening-range breakout", "flag": "flag", "bounce": "oversold bounce"}
@@ -296,8 +299,8 @@ def _num(x):
 def money(x):
     x = float(x)
     if abs(x - round(x)) < 0.005:
-        return "$" + "{:,.0f}".format(round(x))
-    return "$" + "{:,.2f}".format(x)
+        return "₹" + "{:,.0f}".format(round(x))
+    return "₹" + "{:,.2f}".format(x)
 
 
 # ---------------------------------------------------------------- plan mode (the default)
@@ -364,10 +367,13 @@ def size_trade(plan, cfg, budget=None, limit=None, price=None, cash=None, today=
     available = max(round(available, 2), 0.0)
 
     limits = []
-    max_loss = _f(c.get("max_loss_per_trade_usd"))
-    if max_loss:
-        limits.append({"name": "max loss", "usd": max_loss, "per": risk, "shares": shares_for(max_loss, risk),
-                       "how": "%s max loss / %s risk a share" % (money(max_loss), _price(risk))})
+    # Capital allocation safety model: Quantity = 200 / (Entry Price - Stop Loss Price)
+    max_loss = _f(c.get("max_loss_per_trade_inr")) or _f(c.get("max_loss_per_trade_usd")) or 200.0
+    qty_formula = int(max_loss / risk) if risk > 0 else 0
+    limits.append({"name": "max loss", "usd": max_loss, "per": risk, "shares": qty_formula,
+                   "how": "Quantity = 200 / (Entry - Stop) [%s / %s = %d shares]"
+                   % (money(max_loss), _price(risk), qty_formula)})
+
     cap_pct = _f(c.get("max_position_pct"))
     if cap_pct:
         cap = round(budget * cap_pct / 100.0, 2)
