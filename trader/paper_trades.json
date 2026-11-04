@@ -65,18 +65,18 @@
   },
   {
     "date": "2026-11-04",
-    "sym": "BHEL.NS",
+    "sym": "BAJAJFINSV.NS",
     "side": "BUY",
-    "buy_time": "09:55 IST",
-    "sell_time": "11:00 IST (Live)",
-    "qty": 79,
-    "entry": 424.0,
-    "exit_price": 423.8,
-    "target": 440.09,
-    "stop": 413.27,
-    "outcome": "IN_FLIGHT",
-    "gross": -15.8,
+    "buy_time": "09:50 IST",
+    "sell_time": "14:30 IST",
+    "qty": 18,
+    "entry": 1777.0,
+    "exit_price": 1747.1,
+    "target": 1847.27,
+    "stop": 1730.15,
+    "outcome": "1430_CUT_EARLY",
+    "gross": -538.2,
     "friction": 15.0,
-    "net": -30.8
+    "net": -553.2
   }
 ]
