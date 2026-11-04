@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-04 10:41:07 IST  
+**Last Updated:** 2026-11-04 05:35:02 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
@@ -24,4 +24,4 @@
 | 2026-10-29 | `KOTAKBANK.NS` | BUY | 10:05 IST | 13:50 IST | 169 | 448.60 | 456.14 | 456.14 | 443.57 | TARGET | +1,274.26 | -60.00 | **+1,214.26** |
 | 2026-11-02 | `DIXON.NS` | BUY | 09:45 IST | 11:05 IST | 2 | 11786.00 | 12374.75 | 12374.75 | 11393.50 | TARGET | +1,177.50 | -60.00 | **+1,117.50** |
 | 2026-11-03 | `MARICO.NS` | BUY | 10:25 IST | 15:00 IST | 40 | 860.60 | 870.25 | 892.06 | 839.62 | 1430_PROFIT_CLOSE | +386.00 | -15.00 | **+371.00** |
-| 2026-11-04 | `BHEL.NS` | BUY | 09:55 IST | 10:40 IST (Live) | 79 | 424.00 | 422.25 | 440.09 | 413.27 | **IN_FLIGHT** | -138.25 | -15.00 | **-153.25** |
+| 2026-11-04 | `BHEL.NS` | BUY | 09:55 IST | 11:00 IST (Live) | 79 | 424.00 | 423.80 | 440.09 | 413.27 | **IN_FLIGHT** | -15.80 | -15.00 | **-30.80** |

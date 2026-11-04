@@ -68,15 +68,15 @@
     "sym": "BHEL.NS",
     "side": "BUY",
     "buy_time": "09:55 IST",
-    "sell_time": "10:40 IST (Live)",
+    "sell_time": "11:00 IST (Live)",
     "qty": 79,
     "entry": 424.0,
-    "exit_price": 422.25,
+    "exit_price": 423.8,
     "target": 440.09,
     "stop": 413.27,
     "outcome": "IN_FLIGHT",
-    "gross": -138.25,
+    "gross": -15.8,
     "friction": 15.0,
-    "net": -153.25
+    "net": -30.8
   }
 ]
