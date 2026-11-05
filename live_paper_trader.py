@@ -451,10 +451,11 @@ def evaluate_date_simulation(target_date: str, cfg: dict, is_paper: bool = True,
     # Real-time mid-session awareness:
     today_str = datetime.datetime.now().strftime("%Y-%m-%d")
     is_live_today = (target_date == today_str)
-    last_bar_time = sub.index[-1].strftime("%H:%M") if not sub.empty else "09:45"
+    last_bar_time = sub.index[-1].strftime("%H:%M") if not sub.empty else chosen["time_obj"].strftime("%H:%M")
     if outcome == "EOD_FLAT" and is_live_today and last_bar_time < cfg.get("flat_by", "15:15"):
         outcome = "IN_FLIGHT"
-        sell_time = f"{sub.index[-1].strftime('%H:%M IST')} (Live)"
+        latest_time_str = sub.index[-1].strftime("%H:%M IST") if not sub.empty else chosen["buy_time"]
+        sell_time = f"{latest_time_str} (Live)"
 
     gross = round(qty * (exit_price - entry if long else entry - exit_price), 2)
     net = round(gross - fee, 2)
