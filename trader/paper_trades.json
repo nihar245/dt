@@ -94,5 +94,21 @@
     "gross": -43.2,
     "friction": 15.0,
     "net": -58.2
+  },
+  {
+    "date": "2026-11-06",
+    "sym": "ABB.NS",
+    "side": "BUY",
+    "buy_time": "12:10 IST",
+    "sell_time": "14:30 IST",
+    "qty": 6,
+    "entry": 6633.0,
+    "exit_price": 6712.5,
+    "target": 6836.25,
+    "stop": 6497.5,
+    "outcome": "1430_PROFIT_CLOSE",
+    "gross": 477.0,
+    "friction": 15.0,
+    "net": 462.0
   }
 ]
