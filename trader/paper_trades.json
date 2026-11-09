@@ -110,5 +110,21 @@
     "gross": 477.0,
     "friction": 15.0,
     "net": 462.0
+  },
+  {
+    "date": "2026-11-09",
+    "sym": "HAL.NS",
+    "side": "SELL",
+    "buy_time": "11:25 IST",
+    "sell_time": "14:25 IST",
+    "qty": 8,
+    "entry": 4867.1,
+    "exit_price": 4962.75,
+    "target": 4723.63,
+    "stop": 4962.75,
+    "outcome": "STOP_LOSS",
+    "gross": -765.2,
+    "friction": 15.0,
+    "net": -780.2
   }
 ]
