@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-09 19:22:42 IST  
+**Last Updated:** 2026-11-11 11:50:09 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
@@ -8,11 +8,11 @@
 
 ## Summary Performance (Closed Trades)
 
-- **Total Paper Trades Executed:** 7 (Active In-Flight: 1)
-- **Win Rate:** 71.4% (5/7)
-- **Cumulative Gross PnL:** ₹+3,109.36
-- **Total Platform Friction:** -₹240.00
-- **Cumulative Net PnL (After Fees):** **₹+2,869.36**
+- **Total Paper Trades Executed:** 8 (Active In-Flight: 1)
+- **Win Rate:** 62.5% (5/8)
+- **Cumulative Gross PnL:** ₹+3,036.56
+- **Total Platform Friction:** -₹255.00
+- **Cumulative Net PnL (After Fees):** **₹+2,781.56**
 
 ---
 
@@ -28,3 +28,4 @@
 | 2026-11-05 | `M&M.NS` | BUY | 12:55 IST | 15:10 IST (Live) | 8 | 3125.90 | 3120.50 | 3272.90 | 3027.90 | **IN_FLIGHT** | -43.20 | -15.00 | **-58.20** |
 | 2026-11-06 | `ABB.NS` | BUY | 12:10 IST | 14:30 IST | 6 | 6633.00 | 6712.50 | 6836.25 | 6497.50 | 1430_PROFIT_CLOSE | +477.00 | -15.00 | **+462.00** |
 | 2026-11-09 | `HAL.NS` | SELL | 11:25 IST | 14:25 IST | 8 | 4867.10 | 4962.75 | 4723.63 | 4962.75 | STOP_LOSS | -765.20 | -15.00 | **-780.20** |
+| 2026-11-11 | `TATACOMM.NS` | BUY | 11:05 IST | 15:15 IST | 26 | 1748.80 | 1746.00 | 1796.05 | 1717.30 | EOD_FLAT | -72.80 | -15.00 | **-87.80** |
