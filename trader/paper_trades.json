@@ -142,5 +142,21 @@
     "gross": -72.8,
     "friction": 15.0,
     "net": -87.8
+  },
+  {
+    "date": "2026-11-12",
+    "sym": "AUROPHARMA.NS",
+    "side": "BUY",
+    "buy_time": "09:55 IST",
+    "sell_time": "10:45 IST",
+    "qty": 43,
+    "entry": 1817.3,
+    "exit_price": 1797.7,
+    "target": 1846.7,
+    "stop": 1797.7,
+    "outcome": "STOP_LOSS",
+    "gross": -842.8,
+    "friction": 15.0,
+    "net": -857.8
   }
 ]
