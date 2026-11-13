@@ -158,5 +158,21 @@
     "gross": -842.8,
     "friction": 15.0,
     "net": -857.8
+  },
+  {
+    "date": "2026-11-13",
+    "sym": "ADANIENT.NS",
+    "side": "SELL",
+    "buy_time": "12:05 IST",
+    "sell_time": "15:10 IST (Live)",
+    "qty": 20,
+    "entry": 2694.3,
+    "exit_price": 2688.0,
+    "target": 2633.18,
+    "stop": 2735.05,
+    "outcome": "IN_FLIGHT",
+    "gross": 126.0,
+    "friction": 15.0,
+    "net": 111.0
   }
 ]
