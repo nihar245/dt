@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-13 13:03:04 IST  
+**Last Updated:** 2026-11-13 13:25:21 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
