@@ -174,5 +174,21 @@
     "gross": 126.0,
     "friction": 15.0,
     "net": 111.0
+  },
+  {
+    "date": "2026-11-16",
+    "sym": "TATACOMM.NS",
+    "side": "BUY",
+    "buy_time": "12:05 IST",
+    "sell_time": "15:15 IST",
+    "qty": 15,
+    "entry": 1848.0,
+    "exit_price": 1857.5,
+    "target": 1928.47,
+    "stop": 1794.35,
+    "outcome": "EOD_FLAT",
+    "gross": 142.5,
+    "friction": 15.0,
+    "net": 127.5
   }
 ]
