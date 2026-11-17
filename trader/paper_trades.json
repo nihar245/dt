@@ -190,5 +190,21 @@
     "gross": 142.5,
     "friction": 15.0,
     "net": 127.5
+  },
+  {
+    "date": "2026-11-17",
+    "sym": "PNB.NS",
+    "side": "BUY",
+    "buy_time": "10:00 IST",
+    "sell_time": "14:30 IST",
+    "qty": 192,
+    "entry": 151.3,
+    "exit_price": 149.35,
+    "target": 157.91,
+    "stop": 146.89,
+    "outcome": "1430_CUT_EARLY",
+    "gross": -374.4,
+    "friction": 15.0,
+    "net": -389.4
   }
 ]

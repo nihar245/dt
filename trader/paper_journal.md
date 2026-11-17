@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-16 19:06:20 IST  
+**Last Updated:** 2026-11-17 13:15:17 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
@@ -8,11 +8,11 @@
 
 ## Summary Performance (Closed Trades)
 
-- **Total Paper Trades Executed:** 10 (Active In-Flight: 2)
-- **Win Rate:** 60.0% (6/10)
-- **Cumulative Gross PnL:** ₹+2,336.26
-- **Total Platform Friction:** -₹285.00
-- **Cumulative Net PnL (After Fees):** **₹+2,051.26**
+- **Total Paper Trades Executed:** 11 (Active In-Flight: 2)
+- **Win Rate:** 54.5% (6/11)
+- **Cumulative Gross PnL:** ₹+1,961.86
+- **Total Platform Friction:** -₹300.00
+- **Cumulative Net PnL (After Fees):** **₹+1,661.86**
 
 ---
 
@@ -32,3 +32,4 @@
 | 2026-11-12 | `AUROPHARMA.NS` | BUY | 09:55 IST | 10:45 IST | 43 | 1817.30 | 1797.70 | 1846.70 | 1797.70 | STOP_LOSS | -842.80 | -15.00 | **-857.80** |
 | 2026-11-13 | `ADANIENT.NS` | SELL | 12:05 IST | 15:10 IST (Live) | 20 | 2694.30 | 2688.00 | 2633.18 | 2735.05 | **IN_FLIGHT** | +126.00 | -15.00 | **+111.00** |
 | 2026-11-16 | `TATACOMM.NS` | BUY | 12:05 IST | 15:15 IST | 15 | 1848.00 | 1857.50 | 1928.47 | 1794.35 | EOD_FLAT | +142.50 | -15.00 | **+127.50** |
+| 2026-11-17 | `PNB.NS` | BUY | 10:00 IST | 14:30 IST | 192 | 151.30 | 149.35 | 157.91 | 146.89 | 1430_CUT_EARLY | -374.40 | -15.00 | **-389.40** |
