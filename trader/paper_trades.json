@@ -206,5 +206,21 @@
     "gross": -374.4,
     "friction": 15.0,
     "net": -389.4
+  },
+  {
+    "date": "2026-11-18",
+    "sym": "DIXON.NS",
+    "side": "SELL",
+    "buy_time": "12:45 IST",
+    "sell_time": "15:10 IST (Live)",
+    "qty": 2,
+    "entry": 12619.0,
+    "exit_price": 12650.0,
+    "target": 12101.5,
+    "stop": 12964.0,
+    "outcome": "IN_FLIGHT",
+    "gross": -62.0,
+    "friction": 15.0,
+    "net": -77.0
   }
 ]
