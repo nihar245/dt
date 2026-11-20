@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-19 17:51:28 IST  
+**Last Updated:** 2026-11-20 12:48:35 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
@@ -8,11 +8,11 @@
 
 ## Summary Performance (Closed Trades)
 
-- **Total Paper Trades Executed:** 12 (Active In-Flight: 3)
-- **Win Rate:** 58.3% (7/12)
-- **Cumulative Gross PnL:** ₹+2,307.86
-- **Total Platform Friction:** -₹315.00
-- **Cumulative Net PnL (After Fees):** **₹+1,992.86**
+- **Total Paper Trades Executed:** 13 (Active In-Flight: 3)
+- **Win Rate:** 53.8% (7/13)
+- **Cumulative Gross PnL:** ₹+1,712.46
+- **Total Platform Friction:** -₹330.00
+- **Cumulative Net PnL (After Fees):** **₹+1,382.46**
 
 ---
 
@@ -35,3 +35,4 @@
 | 2026-11-17 | `PNB.NS` | BUY | 10:00 IST | 14:30 IST | 192 | 151.30 | 149.35 | 157.91 | 146.89 | 1430_CUT_EARLY | -374.40 | -15.00 | **-389.40** |
 | 2026-11-18 | `DIXON.NS` | SELL | 12:45 IST | 15:10 IST (Live) | 2 | 12619.00 | 12650.00 | 12101.50 | 12964.00 | **IN_FLIGHT** | -62.00 | -15.00 | **-77.00** |
 | 2026-11-19 | `MARUTI.NS` | BUY | 09:50 IST | 14:30 IST | 2 | 13273.00 | 13446.00 | 13838.50 | 12896.00 | 1430_PROFIT_CLOSE | +346.00 | -15.00 | **+331.00** |
+| 2026-11-20 | `COFORGE.NS` | BUY | 10:25 IST | 14:30 IST | 13 | 2140.80 | 2095.00 | 2235.45 | 2077.70 | 1430_CUT_EARLY | -595.40 | -15.00 | **-610.40** |

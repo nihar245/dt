@@ -238,5 +238,21 @@
     "gross": 346.0,
     "friction": 15.0,
     "net": 331.0
+  },
+  {
+    "date": "2026-11-20",
+    "sym": "COFORGE.NS",
+    "side": "BUY",
+    "buy_time": "10:25 IST",
+    "sell_time": "14:30 IST",
+    "qty": 13,
+    "entry": 2140.8,
+    "exit_price": 2095.0,
+    "target": 2235.45,
+    "stop": 2077.7,
+    "outcome": "1430_CUT_EARLY",
+    "gross": -595.4,
+    "friction": 15.0,
+    "net": -610.4
   }
 ]
