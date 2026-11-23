@@ -254,5 +254,21 @@
     "gross": -595.4,
     "friction": 15.0,
     "net": -610.4
+  },
+  {
+    "date": "2026-11-23",
+    "sym": "TATASTEEL.NS",
+    "side": "SELL",
+    "buy_time": "10:40 IST",
+    "sell_time": "15:15 IST",
+    "qty": 129,
+    "entry": 164.97,
+    "exit_price": 162.9,
+    "target": 155.15,
+    "stop": 171.52,
+    "outcome": "EOD_FLAT",
+    "gross": 267.03,
+    "friction": 15.0,
+    "net": 252.03
   }
 ]
