@@ -270,5 +270,21 @@
     "gross": 267.03,
     "friction": 15.0,
     "net": 252.03
+  },
+  {
+    "date": "2026-11-25",
+    "sym": "M&M.NS",
+    "side": "BUY",
+    "buy_time": "11:00 IST",
+    "sell_time": "12:50 IST",
+    "qty": 16,
+    "entry": 3521.0,
+    "exit_price": 3468.05,
+    "target": 3600.42,
+    "stop": 3468.05,
+    "outcome": "STOP_LOSS",
+    "gross": -847.2,
+    "friction": 15.0,
+    "net": -862.2
   }
 ]
