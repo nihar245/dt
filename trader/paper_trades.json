@@ -286,5 +286,21 @@
     "gross": -847.2,
     "friction": 15.0,
     "net": -862.2
+  },
+  {
+    "date": "2026-11-26",
+    "sym": "BRITANNIA.NS",
+    "side": "BUY",
+    "buy_time": "10:50 IST",
+    "sell_time": "14:30 IST",
+    "qty": 9,
+    "entry": 5123.4,
+    "exit_price": 5169.4,
+    "target": 5264.02,
+    "stop": 5029.65,
+    "outcome": "1430_PROFIT_CLOSE",
+    "gross": 414.0,
+    "friction": 15.0,
+    "net": 399.0
   }
 ]
