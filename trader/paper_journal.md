@@ -1,6 +1,6 @@
 # Intraday Paper Trading Live Journal & Execution Audit
 
-**Last Updated:** 2026-11-26 18:44:33 IST  
+**Last Updated:** 2026-11-27 13:47:37 IST  
 **Broker Engine:** Flattrade (Zero Brokerage | Est. Friction: ₹15.00/trade)  
 **Capital Risk Model:** ₹850 Risk per Trade | Target: 1.5R | Breakeven at +0.7R
 
@@ -8,11 +8,11 @@
 
 ## Summary Performance (Closed Trades)
 
-- **Total Paper Trades Executed:** 16 (Active In-Flight: 3)
-- **Win Rate:** 56.2% (9/16)
-- **Cumulative Gross PnL:** ₹+1,546.29
-- **Total Platform Friction:** -₹375.00
-- **Cumulative Net PnL (After Fees):** **₹+1,171.29**
+- **Total Paper Trades Executed:** 17 (Active In-Flight: 3)
+- **Win Rate:** 52.9% (9/17)
+- **Cumulative Gross PnL:** ₹+741.29
+- **Total Platform Friction:** -₹390.00
+- **Cumulative Net PnL (After Fees):** **₹+351.29**
 
 ---
 
@@ -39,3 +39,4 @@
 | 2026-11-23 | `TATASTEEL.NS` | SELL | 10:40 IST | 15:15 IST | 129 | 164.97 | 162.90 | 155.15 | 171.52 | EOD_FLAT | +267.03 | -15.00 | **+252.03** |
 | 2026-11-25 | `M&M.NS` | BUY | 11:00 IST | 12:50 IST | 16 | 3521.00 | 3468.05 | 3600.42 | 3468.05 | STOP_LOSS | -847.20 | -15.00 | **-862.20** |
 | 2026-11-26 | `BRITANNIA.NS` | BUY | 10:50 IST | 14:30 IST | 9 | 5123.40 | 5169.40 | 5264.02 | 5029.65 | 1430_PROFIT_CLOSE | +414.00 | -15.00 | **+399.00** |
+| 2026-11-27 | `MUTHOOTFIN.NS` | SELL | 12:20 IST | 14:15 IST | 14 | 2573.90 | 2631.40 | 2487.65 | 2631.40 | STOP_LOSS | -805.00 | -15.00 | **-820.00** |

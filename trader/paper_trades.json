@@ -302,5 +302,21 @@
     "gross": 414.0,
     "friction": 15.0,
     "net": 399.0
+  },
+  {
+    "date": "2026-11-27",
+    "sym": "MUTHOOTFIN.NS",
+    "side": "SELL",
+    "buy_time": "12:20 IST",
+    "sell_time": "14:15 IST",
+    "qty": 14,
+    "entry": 2573.9,
+    "exit_price": 2631.4,
+    "target": 2487.65,
+    "stop": 2631.4,
+    "outcome": "STOP_LOSS",
+    "gross": -805.0,
+    "friction": 15.0,
+    "net": -820.0
   }
 ]
